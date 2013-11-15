@@ -6,7 +6,10 @@ require([
   'visualizations/multiband',
   'visualizations/multiband2',
   'visualizations/globe',
-  'visualizations/boids/simple'
+  'visualizations/boids/simple',
+  'visualizations/waveform-interp',
+  'visualizations/raymarching',
+  'visualizations/beatdetection'
 //  'visualizations/sample'
 ], function (models, audio) {
   'use strict';
