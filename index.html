@@ -11,6 +11,148 @@
   <script type="text/javascript" src="vendor/pre3d_path_utils.js"></script>
   <script type="text/javascript" src="vendor/pocket.api.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
+  <script id="2d-vertex-shader" type="x-shader/x-vertex">
+
+    /* Shader for Raymarcher example */
+
+    precision mediump float;
+    /* attribute vec2 position; */
+
+    void main() {
+      gl_Position = vec4(position.x, position.y, 0, 1);
+    }
+
+  </script>
+  <script id="2d-fragment-shader" type="x-shader/x-fragment">
+
+    /* Shader for Raymarcher example */
+
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform vec2 resolution;
+    uniform float time;
+    uniform float beattime;
+    uniform vec2 mouse;
+    uniform float hue1;
+    uniform vec3 color1;
+    uniform float hue2;
+    uniform vec3 color2;
+    uniform sampler2D specSampler;
+
+    // public domain
+    #define N 10
+    #define PI2 (3.14159265*2.0)
+
+    float mx2 = sin(2.32 + time * 0.037312) * 1.45 + 0.5 + (mouse.x - 0.5) / 3.0;
+    float my2 = cos(0.01 + time * 0.043312) * 1.45 + 0.5 + (mouse.y - 0.5) / 3.0;
+    float mz2 = cos(1.80 + time * 0.023312) * 1.45 + 0.5;
+
+    float c12 = cos(my2 * PI2);
+    float s12 = sin(my2 * PI2);
+    float c22 = cos(mx2 * PI2);
+    float s22 = sin(mx2 * PI2);
+    float c32 = cos(mz2 * PI2);
+    float s32 = sin(mz2 * PI2);
+
+    float sdSphere( vec3 p, float s ) {
+      return length(p)-s;
+    }
+
+    float sdCylinderZ( vec3 p, vec3 c ) {
+      return length(p.xz-c.xy)-c.z;
+    }
+
+    float sdCylinderY( vec3 p, vec3 c ) {
+      return length(p.xy-c.xz)-c.y;
+    }
+
+    float sdCylinderX( vec3 p, vec3 c ) {
+      return length(p.yz-c.yz)-c.x;
+    }
+
+    float bump(vec3 p) {
+      float v = 1.0;
+      v *= sin(p.x*9.0 + time * 5.0);
+      v *= cos(p.z*7.0 - time / 3.0);
+      v *= sin(p.y*8.0 + time * 5.0);
+      return v;
+    }
+
+    float udRoundBox( vec3 p, vec3 b, float r )
+    {
+      return length(max(abs(p)-b,0.0))-r;
+    }
+
+    vec3 opRep( vec3 p, vec3 c ) {
+        return mod(p,c)-0.5*c;
+    }
+
+    float dist( vec3 v ) {
+
+      vec3 v2 = v;
+
+      vec2 uv = vec2(mod(v.z * 6.0, 64.0) / 64.0, 0);
+      vec3 tex = texture2D(specSampler, uv).rgb;
+
+      vec3 rep2 = opRep(v2 - vec3(5.0-tex.r*3.0,5.0+tex.r*3.0,time * 0.0), vec3(10.0, 10.0, 0.5));
+
+      float sp4 = sdSphere(rep2, 0.25);
+
+      vec3 rep = opRep(v2, vec3(5.0, 5.0, 5.0));
+
+      float rr1 = max(0.2, 0.3 - beattime * 1.2);
+
+      float sp1 = sdCylinderX(rep, vec3(rr1, 0.0, 0.0));
+      float sp2 = sdCylinderY(rep, vec3(0.0, rr1, 0.0));
+      float sp3 = sdCylinderZ(rep, vec3(0.0, 0.0, rr1));
+
+      sp1 = udRoundBox(rep, vec3(rr1,rr1,10.0), 0.0);
+      sp2 = udRoundBox(rep, vec3(rr1,10.0,rr1), 0.0);
+      sp3 = udRoundBox(rep, vec3(10.0,rr1,rr1), 0.0);
+
+      // sp2 = 100.0;
+      return min(min(min(sp1, sp2), sp3), sp4);
+    }
+
+    #define M 35
+
+    void main() {
+      vec3 pos, dir;
+      dir = vec3( (gl_FragCoord.xy - resolution/2.0) / min(resolution.y,resolution.x), 0.6);
+      dir = normalize(dir);
+
+      float t = 0.0;
+      pos = vec3(0.0);
+      pos += vec3(1.5, 1.8, time * 3.0);
+
+      vec3 v = dir;
+        v = vec3( v.x*c12-v.y*s12, v.y*c12+v.x*s12, v.z ); // rotate
+        v = vec3( v.x, v.y*c22-v.z*s22, v.z*c22+v.y*s22 ); // rotate
+        v = vec3( v.x*c32-v.z*s32, v.y, v.z*c32+v.x*s32 ); // rotate
+        dir = v;
+
+      int j = 0;
+      for ( int i = 0; i < M; i++ ) {
+        vec3 hit = pos + dir * t;
+        float d = dist( hit );
+        t += d * 0.99;
+
+        if ( abs(d) > 0.00001 )
+          continue;
+
+        vec3 c = (0.7 + 0.5 * cos((hit.x + hit.z) * 0.3)) * color1
+             + (0.7 + 0.5 * sin((hit.y + hit.z) * 0.4)) * color2;
+
+        gl_FragColor = vec4( float(M-i) / float(M) ) * vec4(c, 1.0);
+        return;
+      }
+
+      gl_FragColor = vec4( 0.0 );
+    }
+
+  </script>
 </head>
 <body>
   <div id="vz-screen"></div>
