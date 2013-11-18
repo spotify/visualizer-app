@@ -11,7 +11,7 @@ API
 
 For more information about the Audio API, please visit:
 
-https://developer.spotify.com/docs/apps/api/1.0/audio.html
+https://developer.spotify.com/docs/apps/api/1.0/api-audio.html
 
 
 Getting Started
