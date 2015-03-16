@@ -1,22 +1,12 @@
 Audio API - Sample Visualizer App
 =================================
 
-This app is provided as an example to developers interested in the new Audio API.
-The goal of this app is to demonstrate how to use the Audio API to create a Visualizer.
-By no means this is a finished product and is not intended to be used in production.
-This is strictly a demo.
+This repository has been cleared and left intentionally empty.
 
-API
----
+Spotify closed the submission process for new apps on the 24th of March 2014. Future releases of the Spotify Desktop client will no longer feature an App Finder tab and will no longer support the presentation of Spotify Apps, therefore this API has been discontinued.
 
-For more information about the Audio API, please visit:
+With the growing importance of mobile devices and with many developers asking for the tools to build apps outside of our desktop platform, we recognized the need to make a new set of APIs and SDKs available. These would ensure the Spotify platform remained relevant and easy to develop on, as well as enabling you to build innovative and engaging music experiences.
 
-https://developer.spotify.com/docs/apps/api/1.0/api-audio.html
+As a result, we launched our [Web API](https://developer.spotify.com/web-api/) and mobile SDKs for [iOS](https://developer.spotify.com/technologies/spotify-ios-sdk/) and [Android](https://developer.spotify.com/technologies/spotify-android-sdk/).
 
-
-Getting Started
----------------
-
-In order to run this application, follow the instructions on the [developer website](https://developer.spotify.com/technologies/apps/guidelines/developer/)
-on how to setup your environment for development. Then clone this project into your Spotify folder.
-Launch the app by typing `spotify:app:visualizer` in the search box.
+Please read the [announcement](https://developer.spotify.com/news-stories/2014/03/24/closure-of-spotify-apps-submissions/) on our Developer News site for more information.
